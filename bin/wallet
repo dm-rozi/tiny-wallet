@@ -1,0 +1,114 @@
+#!/usr/bin/env ruby
+$LOAD_PATH.unshift File.expand_path("../lib", __dir__)
+
+require "optparse"
+require "json"
+require "fileutils"
+require "bitcoin"
+
+require "wallet/commands/generator"
+require "wallet/commands/balance_fetcher"
+require "wallet/commands/sending"
+
+COMMANDS = %w[generate balance send status help]
+
+def print_help
+  puts <<~HELP
+    Usage:
+      wallet [command] [options]
+
+    Commands:
+      generate  --wallet NAME                             Generate a new wallet (key pair and address)
+      balance   --wallet NAME                             Show the balance of a wallet
+      send      --wallet NAME --to ADDR --amount AMOUNT   Send Bitcoin from a wallet to an address
+      help                                                Show this help message
+  HELP
+end
+
+def format_btc(satoshis)
+  (satoshis.to_f / 100_000_000).round(8)
+end
+
+if ARGV.empty? || %w[-h --help help].include?(ARGV[0])
+  print_help
+  exit
+end
+
+command = ARGV.shift
+
+unless COMMANDS.include?(command)
+  puts "Unknown command: #{command}"
+  print_help
+  exit 1
+end
+
+case command
+when "generate"
+  options = {}
+
+  OptionParser.new do |opts|
+    opts.banner = "Usage: wallet generate --wallet NAME"
+    opts.on("--wallet NAME", "Name of the wallet") { |w| options[:wallet] = w }
+  end.parse!
+
+  if options[:wallet].nil?
+    puts "Wallet name is required."
+    exit 1
+  end
+
+  path, wallet_data = Wallet::Commands::Generator.new(options[:wallet]).call
+
+  puts "Wallet saved to: #{path}"
+  puts " * Address: #{wallet_data[:address]}"
+  puts " * Public key: #{wallet_data[:public_key]}"
+when "balance"
+  options = {}
+  OptionParser.new do |opts|
+    opts.banner = "Usage: wallet balance [--wallet NAME | --address ADDRESS]"
+    opts.on("--wallet NAME", "Wallet file name") { |v| options[:wallet] = v }
+    opts.on("--address ADDRESS", "Bitcoin address") { |v| options[:address] = v }
+  end.parse!
+
+  if options[:wallet].nil? && options[:address].nil?
+    puts "Either --wallet or --address must be provided"
+    exit 1
+  end
+
+  address, confirmed_total, utxos = Wallet::Commands::BalanceFetcher.new(wallet_name: options[:wallet], address: options[:address]).call
+
+  puts "Address: #{address}"
+  puts "Confirmed: #{format_btc(confirmed_total)} BTC (#{confirmed_total} sat)"
+  puts "Pending:   0.0 BTC (0 sat)"
+  puts "Total:     #{format_btc(confirmed_total)} BTC"
+
+  if utxos.any?
+    puts "========================="
+    puts "Confirmed UTXOs:"
+    utxos.each_with_index do |utxo, i|
+      puts "  #{i + 1}. txid: #{utxo["txid"]}, vout: #{utxo["vout"]}, value: #{utxo["value"]} sat"
+    end
+  end
+when "send"
+  options = {}
+  OptionParser.new do |opts|
+    opts.banner = "Usage: wallet send --wallet NAME --to ADDR --amount AMOUNT"
+
+    opts.on("--wallet NAME", "Sender wallet name (source)") { |v| options[:wallet] = v }
+    opts.on("--to ADDR", "Recipient address") { |v| options[:to] = v }
+    opts.on("--amount AMOUNT", Float, "Amount in BTC") { |v| options[:amount] = v }
+  end.parse!
+
+  missing = %i[wallet to amount].select { |key| options[key].nil? }
+
+  unless missing.empty?
+    puts "❌ Missing required options: #{missing.join(', ')}"
+    exit 1
+  end
+
+  tx, tx_hex = Wallet::Commands::Sending.new(wallet_name: options[:wallet], to: options[:to], amount: options[:amount]).call
+
+  puts "Transaction hex:\n#{tx_hex}" if tx_hex
+  puts "Transaction ID: #{tx.txid}" if tx
+else
+  print_help
+end

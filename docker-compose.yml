@@ -1,0 +1,10 @@
+name: btc-wallet
+services:
+  tiny-wallet:
+    build: .
+    volumes:
+      - .:/app
+      - ./wallets:/app/wallets
+      - ./logs:/app/logs
+    stdin_open: true
+    tty: true

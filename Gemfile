@@ -2,4 +2,9 @@
 
 source "https://rubygems.org"
 
-# gem "rails"
+gem "bitcoinrb"
+gem "rspec"
+gem "vcr"
+gem "webmock"
+gem "dotenv"
+gem "json"
