@@ -1,0 +1,57 @@
+---
+http_interactions:
+- request:
+    method: get
+    uri: https://mempool.space/signet/api/address/tb1q0gur99drlhcqtt4c6em662cmddw3ulqdq252dm/utxo
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+      User-Agent:
+      - Ruby
+      Host:
+      - mempool.space
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Server:
+      - nginx
+      Date:
+      - Tue, 17 Jun 2025 11:27:31 GMT
+      Content-Type:
+      - application/json
+      Content-Length:
+      - '513'
+      Connection:
+      - keep-alive
+      Cache-Control:
+      - no-cache
+      - public
+      X-Powered-By:
+      - mempool-electrs 3.2.0-dev-6cb9bec
+      Access-Control-Allow-Origin:
+      - "*"
+      Expires:
+      - Tue, 17 Jun 2025 11:27:30 GMT
+      Onion-Location:
+      - http://mempoolhqx4isw62xs7abwphsq7ldayuidyx2v2oethdhhj6mlo2r6ad.onion/signet/api/address/tb1q0gur99drlhcqtt4c6em662cmddw3ulqdq252dm/utxo
+      Strict-Transport-Security:
+      - max-age=63072000; includeSubDomains; preload
+      Content-Security-Policy:
+      - frame-ancestors 'self'
+      Pragma:
+      - public
+      Vary:
+      - Accept-Language
+      - Cookie
+    body:
+      encoding: UTF-8
+      string: '[{"txid":"bd91b397f6012aa42c835bbdb1da7947fb33e3f22683637f8a8dae19166aa948","vout":385,"status":{"confirmed":true,"block_height":256106,"block_hash":"0000000ac19c08692a699330885fb05d1309d37c0a871037924f6ab6d84dd48b","block_time":1749739732},"value":328739},{"txid":"c3b82891a879e928c3f4106a58915bd9ab053bdd4f9c6c0b41be4f886580d196","vout":511,"status":{"confirmed":true,"block_height":256107,"block_hash":"00000004ca21fb3d0c69e45deb671c31396d9c882441d6ffaaad6d3fcc44934b","block_time":1749740996},"value":328732}]'
+  recorded_at: Tue, 17 Jun 2025 11:27:31 GMT
+recorded_with: VCR 6.3.1
