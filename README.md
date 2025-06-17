@@ -1,8 +1,8 @@
-CLI ruby scripts for generating BTC wallet, checking balance, creating transactions (only Signet test environment).
+### CLI ruby scripts for generating BTC wallet, checking balance, creating transactions (only Signet test environment).
 
 Usage instruction:
 
-Start in docker
+Start using docker
 
 ```
 docker compose build
@@ -69,7 +69,73 @@ Transaction hex:
 Transaction ID: cb3223ed602be04863b822e6fff00b13625318c73013a7caf62d4d5eb7a5a505
 ```
 
-Scope limitations:
+## Scope limitations:
 - fix Fee as a Constant value.
 - the script does not include any encryption mechanisms for storing private keys.
+- without local signet node
 
+## Rspec tests running
+```
+bundle exec rspec
+
+
+Randomized with seed 46463
+
+Wallet::Commands::Sending
+  #call with key mismatch
+    raises KeyMismatch error
+  #call
+VCR Cassette: Wallet::Commands::Sending/#call/sends transaction and returns tx + hex
+    sends transaction and returns tx + hex
+  #call insufficient funds
+    raises InsufficientFunds error
+  #call without wallet file
+    raises WalletNotFound error
+
+Core::KeyGenerator
+  generates a valid key
+  raises an error for invalid input
+
+Core::Validator::WalletDataValidator
+  raises on invalid wallet data
+  validates correct wallet data
+
+Wallet::Commands::BalanceFetcher
+  when address is syntactically invalid
+    raises InvalidWalletFormat
+  when wallet exists but address is missing
+    raises InvalidWalletData
+  with real address that has no UTXOs
+    returns 0 sats and empty array
+  when mempool API fails with errors
+    it raises an API error
+  when wallet file does not exist
+    raises WalletNotFound
+  #call
+    returns address, total sats and UTXOs from mempool
+  when neither address nor wallet_name is given
+    raises InvalidWalletFormat
+
+Core::Validator::WifValidator
+  validates a correct WIF
+  raises on invalid WIF
+
+Core::Validator::AddressValidator
+  raises on invalid address
+  validates a correct address
+
+Wallet::Commands::Generator
+  #call
+    when file cannot be written due to permission error
+      raises PermissionDenied error
+    when wallet file already exists
+      raises WalletAlreadyExists error
+    when wallet does not exist
+      creates a new wallet file and returns the path and data
+
+Finished in 0.86386 seconds (files took 0.29985 seconds to load)
+22 examples, 0 failures
+```
+
+
+Project is implemented in learning purposes.
