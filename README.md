@@ -1,7 +1,10 @@
 ### CLI ruby scripts for generating BTC wallet, checking balance, creating transactions (only Signet test environment).
 
-Usage instruction:
-
+## Scope limitations:
+- fix Fee as a Constant value.
+- the script does not include any encryption mechanisms for storing private keys.
+- without local signet node
+### Usage instruction:
 Start using docker
 
 ```
@@ -16,7 +19,7 @@ wallet balance [--wallet NAME | --address ADDRESS]
         --address ADDRESS            Bitcoin address
 ```
 
-Generate new wallet at local directory \wallet
+Generate new wallet at local directory ```\wallet```
 
 ```
 docker compose run --rm tiny-wallet ruby bin/wallet generate --wallet <wallet_name>
@@ -68,11 +71,6 @@ Transaction hex:
 0100000000010156c461aafef5358e7d9725d7d16711df27eb0b62caa339242df9df6166c974d60100000000ffffffff029c18000000000000160014d83d2f703e03793e6e3caac8a815fd4fb9269fb07d76000000000000160014ca78f6da5ae7030d4eae2a5a617146c3c47a71150247304402204a10dcb5f993cf37d33162f4777cfef71c0f1c6acde76102449ba15bbec4762b0220152c13977c0304985061f52f6782a5a9e813a686217ef027f960ace831db4336012103fcb829ff033b9dfda302aae7abd8aaf602c67e54d4d0837f46f7e0da37e07c5200000000
 Transaction ID: cb3223ed602be04863b822e6fff00b13625318c73013a7caf62d4d5eb7a5a505
 ```
-
-## Scope limitations:
-- fix Fee as a Constant value.
-- the script does not include any encryption mechanisms for storing private keys.
-- without local signet node
 
 ## Rspec tests running
 ```
